@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import iconRight from "../../assets/login-right-side.webp"
-
+import logoSkillup from "../../assets/logo-skillup.webp"
 
 const Login = () => {
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
       <div className='flex flex-col justify-center order-last w-11/12 h-full p-4 mx-auto lg:w-9/12 xl:w-9/12 md:w-10/12 sm:w-10/12 lg:order-first xl:order-first md:order-last'>
         <div className='flex flex-col gap-5 mx-auto'>
-          <h1>Logo</h1>
+          <img src={logoSkillup} alt='Skillup-logo' className='w-2/12' />
           <h1 className='text-2xl font-bold'>Masuk ke akun kamu</h1>
           <h3 className='max-w-md text-md font-semibild'>Belajar gratis di Skillup, dan memulai karir yang kamu cita-citata sejak dalam embrio!</h3>
           <form className='flex flex-col w-full gap-8'>
