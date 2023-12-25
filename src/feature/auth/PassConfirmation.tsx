@@ -1,6 +1,6 @@
 import Input from '../../components/Input'
 import Button from '../../components/Button'
-import iconRight from "../../assets/login-right-side.webp"
+import iconRight from "../../assets/resetPass.webp"
 import logoSkillup from "../../assets/logo-skillup.webp"
 
 

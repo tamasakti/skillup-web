@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
-import iconRight from "../../assets/login-right-side.webp"
+import iconRight from "../../assets/ForgetPass.webp"
 import logoSkillup from "../../assets/logo-skillup.webp"
 
 const ForgetPassword = () => {
