@@ -3,10 +3,115 @@ import Input, { InputCustom } from '../../components/Input'
 import Button from '../../components/Button'
 import iconRight from "../../assets/Register Icon.webp"
 import logoSkillup from "../../assets/logo-skillup.webp"
+import { useEffect, useState } from 'react'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useDispatch } from 'react-redux'
+import {  createUserWithEmailAndPassword } from 'firebase/auth'
+import { register } from '../../utils/redux/slice/userSlice'
+import {auth, db} from "../../config/firebase"
+import withReactContent from 'sweetalert2-react-content'
+import Swal from '../../utils/types/Swal'
+import { addDoc, collection } from 'firebase/firestore'
+
+interface inputData {
+  uid? : string,
+  firstName : string,
+  lastName : string,
+  email : string,
+  password: string,
+}
 
 
-const Register = () => {
+const Register = () => { 
+  const MySwal = withReactContent(Swal)
+  const [disable, setDisable] = useState<boolean>(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [role, setRole] = useState<string>("")
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [authUser, setAuthUser] = useState<inputData>({
+    firstName : "",
+    lastName : "",
+    email : "",
+    password: "",
+  })
+ const {firstName, lastName, email, password} = authUser
+
+
+  useEffect(() => {
+    if(firstName && lastName && email && password.length > 6 && role !== "") {
+      setDisable(false)
+    } else {
+      setDisable(true)
+    } 
+
+  }, [firstName, lastName, email, password, role])
+  
+ 
+  function handleRegisterAccount(e: React.ChangeEvent<HTMLInputElement>) {
+    
+    const {name, value} = e.target
+    setAuthUser(prev => ({
+      ...prev,
+      [name] : value
+    }))
+  }
+
+  function handleTogglePass() {
+    setShowPassword(!showPassword)
+  }
+
+  function handleRegister (e:React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    createUserWithEmailAndPassword(auth, email, password) 
+    .then((user) => {
+      const {uid} = user.user
+      dispatch(register({
+          firstName : firstName,
+          lastName : lastName,
+          email : email,
+          password : password,
+          role : role,
+          uid : uid
+      }))
+      addUserToDB(uid)
+      MySwal.fire({
+        title: "Sukses",
+        text : "Berhasi Mendaftar",
+        showCancelButton : false
+      });
+      navigate("/login")
+    })
+    .catch((error) => {
+      console.log(error.message)
+      MySwal.fire({
+        title: "Gagal",
+        text: "Akun Gagal Didaftarkan",
+        showCancelButton:false,
+      })
+    })
+    .finally(() => setLoading(false))
+  }
+
+  async function addUserToDB(uid:string) {
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+        firstName : firstName,
+          lastName : lastName,
+          email : email,
+          password : password,
+          role : role,
+          uid : uid
+      })
+      console.log(docRef.id)
+    } catch (error:any) {
+        console.log(error.message)
+    }
+  }
+
+ 
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
     <div className='flex flex-col justify-center order-last w-11/12 h-full p-4 mx-auto lg:w-9/12 xl:w-9/12 md:w-10/12 sm:w-10/12 lg:order-first xl:order-first md:order-last'>
@@ -14,46 +119,58 @@ const Register = () => {
       <img src={logoSkillup} alt='Skillup-logo' className='w-3/12 cursor-pointer lg:w-2/12 xl:w-2/12 md:w-3/12 sm:w-3/12' onClick={() => navigate("/")}/>
         <h1 className='text-2xl font-bold'>Bikin akun kamu</h1>
         <h3 className='max-w-md text-md font-semibild'>Nggak susah kok, kamu cuma tinggal masukin beberapa data aja terus langsung jadi deh!</h3>
-        <form className='flex flex-col w-full gap-8'>
+        <form className='flex flex-col w-full gap-8' onSubmit={handleRegister}>
             <div className='flex flex-col gap-4'>
                 <label htmlFor='fullName' aria-label='fullName' className='font-semibold'>Nama Lengkap</label>
                 <div className='grid grid-cols-2 gap-2'>
-                <InputCustom id='firstName' name='firstName' type='text' placeholder='First Name' className='p-2 text-lg font-semibold text-black rounded-lg bg-input'/>
-                <InputCustom id='lastName' name='lastName' type='text' placeholder='Last Name' className='p-2 text-lg font-semibold rounded-lg bg-input'/>
+                <InputCustom id='firstName' name='firstName' type='text' placeholder='First Name'
+                onChange={handleRegisterAccount} className='p-2 text-lg font-semibold text-black rounded-lg bg-input'/>
+                <InputCustom id='lastName' name='lastName' type='text'
+                onChange={handleRegisterAccount} placeholder='Last Name' className='p-2 text-lg font-semibold rounded-lg bg-input'/>
                 </div>
+            </div>
+            <div className='flex flex-col flex-1 gap-3'>
+              <label className='font-semibold text-md'>Account Type</label>
+            <select name="role" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setRole(e.target.value)} className={disable ? "p-3 font-semibold rounded-lg text-slate-400 hover:text-black" : "p-3 font-semibold rounded-lg text-black"}>
+              <option value="">Select Account Type</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
             </div>
           <Input 
           label='Email' 
           htmlFor='Email'
           ariaLabel='email'  
+          onChange={handleRegisterAccount}
           id='email' 
           placeholder='Type your Email Here' name='email' 
           type='email'
           className='p-2 font-semibold rounded-lg bg-input'
         />
-        <div>
+        <div className='relative'>
         <Input 
           label='Password' 
           htmlFor='Password'
           ariaLabel='password'  
           id='password' 
+          onChange={handleRegisterAccount}
           placeholder='*******' 
           name='password' 
-          type='password'
+          type={showPassword ? "text" : "password"}
           className='p-2 font-semibold rounded-lg bg-input'
         />
+        <button type='button' onClick={handleTogglePass} className='absolute right-5 bottom-3'>
+          {showPassword ? <FaEye/> : <FaEyeSlash />}
+          
+        </button>
         </div>
-        <div className='flex flex-row justify-between'>
-          <span className='flex flex-row gap-2'>
-          <input type='checkbox'value="ingat saya"/>
-            <label className='font-bold'>Ingat Saya</label>
-          </span>
-          <Link to="#" className='font-semibold text-blue-700'>Lupa Password</Link>
-        </div>
+        
         <Button 
         id='btn-login'
         label='Daftar'
-        className='p-3 text-lg font-bold text-white rounded-lg shadow-xl bg-primary hover:bg-black hover:rounded-2xl'
+        className='p-3 text-lg font-bold text-white rounded-lg shadow-xl bg-primary hover:bg-black hover:rounded-2xl disabled:bg-slate-400 disabled:cursor-not-allowed'
+        type='submit'
+        disabled = {disable ? true : false}
         />
       </form>
       <span className='flex flex-row gap-1 mx-auto my-4 font-semibold'>

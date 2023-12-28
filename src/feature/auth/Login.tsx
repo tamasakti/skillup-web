@@ -6,11 +6,51 @@ import logoSkillup from "../../assets/logo-skillup.webp"
 import { FaGooglePlusSquare } from "react-icons/fa"
 import { FaFacebookSquare } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa6";
+import withReactContent from 'sweetalert2-react-content'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Swal from '../../utils/types/Swal'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
-
+interface authData {
+  email: string,
+  password : string
+}
 
 const Login = () => {
+  const MySwal = withReactContent(Swal)
+  const [disable, setDisable] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [authUser, setAuthUser] = useState<authData>({
+    email : "",
+    password: ""
+  })
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const {email, password} = authUser
+  
+  useEffect(() => {
+    if(email && password) {
+      setDisable(false)
+    } else {
+      setDisable(true)
+    }
+  }, [email, password])
+
+  function handleLoginAccount(e:React.ChangeEvent<HTMLInputElement>) {
+    const {name, value} = e.target
+    setAuthUser(prev => ({
+      ...prev,
+      [name] : value
+    }))
+  }
+
+  function handleTogglePass() {
+    setShowPassword(!showPassword)
+  }
+  
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
       <div className='flex flex-col justify-center order-last w-11/12 h-full p-4 mx-auto lg:w-9/12 xl:w-9/12 md:w-10/12 sm:w-10/12 lg:order-first xl:order-first md:order-last'>
@@ -28,17 +68,21 @@ const Login = () => {
             type='email'
             className='p-2 font-semibold rounded-lg bg-input'
           />
-          <div>
+          <div className='relative'>
           <Input 
             label='Password' 
             htmlFor='Password'
             ariaLabel='password'  
             id='password' 
+            onChange={handleLoginAccount}
             placeholder='*******' 
             name='password' 
-            type='password'
+            type= {showPassword ? "text" : "password"}
             className='p-2 font-semibold rounded-lg bg-input'
           />
+          <button type='button' onClick={handleTogglePass} className='absolute right-5 bottom-3'>
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+          </button>
           </div>
           <div className='flex flex-row justify-between'>
             <span className='flex flex-row gap-2'>

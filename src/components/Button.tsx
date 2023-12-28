@@ -12,8 +12,10 @@ const Button = ({id, label, icon, loading, onClick, ...props}: ButtonProps) => {
   return (
     <button
     id={id}
-    className={`${loading && "bg-gray-700 cursor-not-allowed"}`}
-    disabled={loading}
+    className={`${
+      loading &&
+      "btn w-full mt-4 bg-customcyan text-white disabled:bg-gray-300 disabled:text-gray-500 border-0"
+    }`}
     onClick={onClick}
     {...props}
     >

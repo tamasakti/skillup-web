@@ -14,7 +14,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Input = ({id, placeholder, label, htmlFor,ariaLabel, name, type, ...props} : InputProps) => {
   return (
     <div className='flex flex-col gap-2'>
-        <label htmlFor={htmlFor} aria-aria-label={ariaLabel} className='font-semibold'>{label}</label>
+        <label htmlFor={htmlFor} aria-label={ariaLabel} className='font-semibold'>{label}</label>
         <input 
         id={id}
         placeholder={placeholder}

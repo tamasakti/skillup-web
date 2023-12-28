@@ -52,6 +52,7 @@ const Header = () => {
                         className='fixed left-0 shadow-4xl right-0 top-[2.8rem] p-5 pt-0 border-b bg-main border-b-white/20'
                         >   
                             <ul className='grid gap-4'>
+                                {/* Refactor code later */}
                                 <motion.li
                                 initial={{scale : 0, opacity: 0}}
                                 animate={{scale: 1, opacity:1}}
@@ -118,6 +119,23 @@ const Header = () => {
                                     className="flex items-center justify-between w-full p-5 text-black text-md rounded-xl "
                                     >
                                        About Us
+                                    </NavLink>
+                                </motion.li>
+                                <motion.li
+                                initial={{scale : 0, opacity: 0}}
+                                animate={{scale: 1, opacity:1}}
+                                transition={{
+                                    type: "spring",
+                                    stiffness:260,
+                                    damping: 20,
+                                    delay: 0.1 ,
+                                }}
+                                className='w-full p-[0.08rem] rounded-xl bg-white'
+                                >
+                                    <NavLink to="login"
+                                    className="flex items-center justify-between w-full p-5 text-black text-md rounded-xl "
+                                    >
+                                      Login
                                     </NavLink>
                                 </motion.li>
                             </ul>
