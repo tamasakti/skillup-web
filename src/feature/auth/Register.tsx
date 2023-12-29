@@ -105,7 +105,6 @@ const Register = () => {
           role : role,
           uid : uid
       })
-      console.log(docRef.id)
     } catch (error:any) {
         console.log(error.message)
     }

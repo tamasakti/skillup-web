@@ -107,7 +107,6 @@ function handleRememberToken() {
         text: message,
         showCancelButton: false
       })
-      console.log(message)
     }).finally(() => setLoading(false))
     
   }
@@ -121,10 +120,6 @@ function handleRememberToken() {
       const credentials = GoogleAuthProvider.credentialFromResult(res)
       const token = credentials?.accessToken
       const user = res.user
-
-      console.log("token", token)
-      console.group("user", user)
-      console.log(res)
     }).catch((error) => {
       const {message} = error
       console.log(message)

@@ -5,10 +5,7 @@ import { useClickAway } from 'react-use'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Squash as Hamburger } from 'hamburger-react'
 import { useCookies } from 'react-cookie'
-import {auth} from "../config/firebase"
-import { signOut } from 'firebase/auth'
-import withReactContent from 'sweetalert2-react-content'
-import Swal from '../utils/types/Swal'
+
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false)
@@ -18,22 +15,9 @@ const Header = () => {
     const location = useLocation()
     const pathname = location.pathname
     const navigate = useNavigate()
-    const MySwal = withReactContent(Swal)
 
-    // function handleLogout() {
-    //     signOut(auth)
-    //     .then(() => {
-    //         MySwal.fire({
-    //             title: "Logout",
-    //             text: "Berhasil Logout",
-    //             showCancelButton: false
-    //         })
-    //         removeCookie("token")
-    //         navigate("/login")
-    //     })
-    // }
 
-    
+
 
     useClickAway(ref, () => setIsOpen(false))
   return (

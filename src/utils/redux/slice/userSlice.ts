@@ -14,11 +14,11 @@ const authSlice = createSlice({
     reducers: {
         register : (state, action) => {
             const dataUser = action.payload
-            console.log(dataUser)
+            
         },
         login : (state, action) => {
             const dataLoginUser = action.payload
-            console.log(dataLoginUser)
+            
         }
     },
    
