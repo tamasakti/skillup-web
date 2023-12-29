@@ -39,6 +39,7 @@ const Register = () => {
  const {firstName, lastName, email, password} = authUser
 
 
+
   useEffect(() => {
     if(firstName && lastName && email && password.length > 6 && role !== "") {
       setDisable(false)
@@ -50,7 +51,6 @@ const Register = () => {
   
  
   function handleRegisterAccount(e: React.ChangeEvent<HTMLInputElement>) {
-    
     const {name, value} = e.target
     setAuthUser(prev => ({
       ...prev,
@@ -85,10 +85,10 @@ const Register = () => {
       navigate("/login")
     })
     .catch((error) => {
-      console.log(error.message)
+      const message = error.message
       MySwal.fire({
         title: "Gagal",
-        text: "Akun Gagal Didaftarkan",
+        text: message,
         showCancelButton:false,
       })
     })

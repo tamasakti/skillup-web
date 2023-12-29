@@ -4,13 +4,19 @@ import Button from '../../components/Button'
 import iconRight from "../../assets/login-right-side.webp"
 import logoSkillup from "../../assets/logo-skillup.webp"
 import { FaGooglePlusSquare } from "react-icons/fa"
-import { FaFacebookSquare } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa6";
+import { FaSquareTwitter } from "react-icons/fa6";
+import { FaSquareGithub } from "react-icons/fa6";
 import withReactContent from 'sweetalert2-react-content'
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from '../../utils/types/Swal'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import {auth} from "../../config/firebase"
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { login } from '../../utils/redux/slice/userSlice'
+import { useCookies } from 'react-cookie'
+import { GoogleAuthProvider, TwitterAuthProvider  } from 'firebase/auth'
+
 
 interface authData {
   email: string,
@@ -21,15 +27,17 @@ const Login = () => {
   const MySwal = withReactContent(Swal)
   const [disable, setDisable] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [cookie, setCookie] = useCookies(["token"])
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [remember, setRemember] = useState<boolean>(false)
   const [authUser, setAuthUser] = useState<authData>({
     email : "",
     password: ""
   })
+  const {email, password} = authUser
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const {email, password} = authUser
   
   useEffect(() => {
     if(email && password) {
@@ -39,7 +47,7 @@ const Login = () => {
     }
   }, [email, password])
 
-  function handleLoginAccount(e:React.ChangeEvent<HTMLInputElement>) {
+  function handleLoginAccount(e: React.ChangeEvent<HTMLInputElement>) {
     const {name, value} = e.target
     setAuthUser(prev => ({
       ...prev,
@@ -50,6 +58,92 @@ const Login = () => {
   function handleTogglePass() {
     setShowPassword(!showPassword)
   }
+
+  function rememberMeDate() {
+
+    const date = new Date()
+
+    if(remember) {
+      date.setDate(date.getDate() + 7)
+    } else {
+      date.setDate(date.getDate() + 1)
+    }
+
+    return date.getTime()
+}
+
+rememberMeDate()
+
+function handleRememberToken() {
+  setRemember(!remember)
+}
+  
+
+  function handleLogin(e:React.FormEvent) {
+    e.preventDefault()
+    signInWithEmailAndPassword(auth, email, password)
+    .then((response) => {
+      const {uid, email, accessToken, displayName} = response.user
+      dispatch(login({
+        email: email,
+        password : password,
+        uid: uid
+      }))
+      MySwal.fire({
+        title: "Sukses",
+        text: "Berhasil Log in",
+        showCancelButton : false
+      });
+      setCookie("token", accessToken, {
+        path: "/",
+        maxAge : rememberMeDate()
+      
+      })
+      navigate("/")
+    }).catch((error) => {
+      const message = error.message
+      MySwal.fire({
+        title: 'Gagal',
+        text: message,
+        showCancelButton: false
+      })
+      console.log(message)
+    }).finally(() => setLoading(false))
+    
+  }
+
+  
+
+   function handleLoginGoogle() {
+    const provider = new GoogleAuthProvider()
+     signInWithPopup(auth, provider)
+    .then((res) => {
+      const credentials = GoogleAuthProvider.credentialFromResult(res)
+      const token = credentials?.accessToken
+      const user = res.user
+
+      console.log("token", token)
+      console.group("user", user)
+      console.log(res)
+    }).catch((error) => {
+      const {message} = error
+      console.log(message)
+    })
+  }
+
+  function handleLoginFacebook() {
+    const provider = new TwitterAuthProvider()
+    signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user
+      const credentials = TwitterAuthProvider.credentialFromResult(result)
+      const accessToken = credentials?.accessToken
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+    
   
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
@@ -58,13 +152,15 @@ const Login = () => {
           <img src={logoSkillup} alt='Skillup-logo' className='w-2/12 cursor-pointer' onClick={() => navigate("/")}/>
           <h1 className='text-2xl font-bold'>Masuk ke akun kamu</h1>
           <h3 className='max-w-md text-md font-semibild'>Belajar gratis di Skillup, dan memulai karir yang kamu cita-citata sejak dalam embrio!</h3>
-          <form className='flex flex-col w-full gap-8'>
+          <form onSubmit={handleLogin} className='flex flex-col w-full gap-8'>
             <Input 
-            label='Email' 
+            label='Email'
+            name = "email" 
             htmlFor='Email'
             ariaLabel='email'  
             id='email' 
-            placeholder='Type your Email Here' name='email' 
+            placeholder='Type your Email Here' 
+            onChange={handleLoginAccount}
             type='email'
             className='p-2 font-semibold rounded-lg bg-input'
           />
@@ -86,13 +182,14 @@ const Login = () => {
           </div>
           <div className='flex flex-row justify-between'>
             <span className='flex flex-row gap-2'>
-            <input type='checkbox'value="ingat saya"/>
+            <input type='checkbox'value="ingat saya" onChange={handleRememberToken}/>
               <label className='font-bold'>Ingat Saya</label>
             </span>
-            <Link to="#" className='font-semibold text-blue-700'>Lupa Password</Link>
+            <Link to="/forgotPass" className='font-semibold text-blue-700'>Lupa Password</Link>
           </div>
           <Button 
           id='btn-login'
+          type='submit'
           label='Login'
           className='p-3 text-lg font-bold text-white rounded-lg shadow-xl bg-primary hover:bg-black hover:rounded-2xl'
           />
@@ -105,9 +202,9 @@ const Login = () => {
         <p className='text-lg text-center text-slate-400'>atau login menggunakan</p>
         <hr className='my-2'/>
         <div className='flex flex-row gap-8 mx-auto my-4'>
-          <FaGooglePlusSquare className="text-6xl cursor-pointer text-slate-400 hover:text-red-700 hover:shadow-lg"/>
-          <FaFacebookSquare className="text-6xl cursor-pointer text-slate-400 hover:text-primary hover:shadow-lg"/>
-          <FaLinkedin className="text-6xl cursor-pointer text-slate-400 hover:text-blue-700 hover:shadow-lg"/>
+          <FaGooglePlusSquare className="text-6xl cursor-pointer text-slate-400 hover:text-red-700 hover:shadow-lg" onClick={handleLoginGoogle}/>
+          <FaSquareTwitter className="text-6xl cursor-pointer text-slate-400 hover:text-primary hover:shadow-lg" onClick={handleLoginFacebook} />
+          <FaSquareGithub className="text-6xl cursor-pointer text-slate-400 hover:text-black hover:shadow-lg"/>
         </div>
       </div>
       <div className='flex-col justify-center order-first hidden w-full gap-4 mx-auto sm:flex md:flex lg:flex xl:flex lg:order-last xl:order-last md:order-first bg-gradient-to-tr from-auth via-blue-700 to-blue-900'>

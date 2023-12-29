@@ -4,13 +4,36 @@ import { useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Squash as Hamburger } from 'hamburger-react'
+import { useCookies } from 'react-cookie'
+import {auth} from "../config/firebase"
+import { signOut } from 'firebase/auth'
+import withReactContent from 'sweetalert2-react-content'
+import Swal from '../utils/types/Swal'
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false)
+    const [cookie, , removeCookie] = useCookies(["token"])
+    const token = cookie.token
     const ref = useRef(null)
     const location = useLocation()
     const pathname = location.pathname
     const navigate = useNavigate()
+    const MySwal = withReactContent(Swal)
+
+    // function handleLogout() {
+    //     signOut(auth)
+    //     .then(() => {
+    //         MySwal.fire({
+    //             title: "Logout",
+    //             text: "Berhasil Logout",
+    //             showCancelButton: false
+    //         })
+    //         removeCookie("token")
+    //         navigate("/login")
+    //     })
+    // }
+
+    
 
     useClickAway(ref, () => setIsOpen(false))
   return (
@@ -29,12 +52,10 @@ const Header = () => {
                 </div>
             ):null}
             <div className={pathname !== "/career" ? "flex items-center justify-center flex-1 " : "flex items-center justify-end px-24 flex-1"}>
-            {pathname !== "/career" ? (
-                <NavLink to="/login" className="py-3 text-black bg-white rounded-lg px-7">Login</NavLink>
-            ): (
+            {pathname !== "/career" && token ? (<NavLink to="/logout" className="py-3 text-black bg-white rounded-lg px-7">Logout</NavLink>) : pathname !== "/career" && !token ? (<NavLink to="/login" className="py-3 text-black bg-white rounded-lg px-7">Login</NavLink>) : (
                 <NavLink to="/contact us" className="px-4 py-2 text-black bg-white rounded-lg">Contact Us</NavLink>
             )}
-            
+                
             </div>
             </nav>
         </div>
