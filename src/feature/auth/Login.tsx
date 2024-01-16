@@ -38,6 +38,7 @@ const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+
   
   useEffect(() => {
     if(email && password) {
@@ -83,11 +84,10 @@ function handleRememberToken() {
     e.preventDefault()
     signInWithEmailAndPassword(auth, email, password)
     .then((response) => {
-      const {uid, email, accessToken, displayName} = response.user
+      const {uid, email, accessToken} = response.user
       dispatch(login({
-        email: email,
-        password : password,
-        uid: uid
+        token : accessToken,
+        data: response.user
       }))
       MySwal.fire({
         title: "Sukses",
@@ -97,7 +97,6 @@ function handleRememberToken() {
       setCookie("token", accessToken, {
         path: "/",
         maxAge : rememberMeDate()
-      
       })
       navigate("/")
     }).catch((error) => {
@@ -120,24 +119,21 @@ function handleRememberToken() {
       const credentials = GoogleAuthProvider.credentialFromResult(res)
       const token = credentials?.accessToken
       const user = res.user
+      dispatch(login({
+        token : token,
+        data : user
+      }))
+      setCookie("token", token, {
+        path: "/"
+      })
+      navigate("/")
     }).catch((error) => {
       const {message} = error
       console.log(message)
     })
   }
 
-  function handleLoginFacebook() {
-    const provider = new TwitterAuthProvider()
-    signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user
-      const credentials = TwitterAuthProvider.credentialFromResult(result)
-      const accessToken = credentials?.accessToken
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-  }
+
     
   
   return (
@@ -198,7 +194,7 @@ function handleRememberToken() {
         <hr className='my-2'/>
         <div className='flex flex-row gap-8 mx-auto my-4'>
           <FaGooglePlusSquare className="text-6xl cursor-pointer text-slate-400 hover:text-red-700 hover:shadow-lg" onClick={handleLoginGoogle}/>
-          <FaSquareTwitter className="text-6xl cursor-pointer text-slate-400 hover:text-primary hover:shadow-lg" onClick={handleLoginFacebook} />
+          <FaSquareTwitter className="text-6xl cursor-pointer text-slate-400 hover:text-primary hover:shadow-lg" />
           <FaSquareGithub className="text-6xl cursor-pointer text-slate-400 hover:text-black hover:shadow-lg"/>
         </div>
       </div>

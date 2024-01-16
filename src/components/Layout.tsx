@@ -4,10 +4,15 @@ import Header from './Header'
 import { Outlet } from 'react-router'
 import { useLocation } from "react-router"
 
+
 const Layout = () => {
   const location = useLocation()
   const pathname = location.pathname
   let hidden = false;
+  // const dataGet = JSON.parse(localStorage.getItem("rf._") || "")
+  // const split = dataGet.split("/")
+  // const unique = split[1]
+  // console.log(unique)
 
   switch(pathname) {
     case "/":
@@ -20,6 +25,21 @@ const Layout = () => {
       hidden = true
       break;
     case "/aboutus" :
+      hidden = true
+      break;
+    case "/profile" :
+      hidden = true
+      break;
+    case "/profile/course" :
+      hidden = true
+    break;
+    case "/profile/dashboard" :
+      hidden = true
+      break;
+    case "/profile/coupouns" :
+      hidden = true
+      break;
+    case `/detail/course`:
       hidden = true
       break;
     default:
@@ -35,6 +55,7 @@ const Layout = () => {
       </header>
       ) : null}
       <main className="w-full min-h-screen">
+
         <Outlet />
       </main>
       {hidden ? (

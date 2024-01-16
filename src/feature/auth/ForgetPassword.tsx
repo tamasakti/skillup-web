@@ -51,7 +51,7 @@ const ForgetPassword = () => {
         text: "Password Reset Link",
         showCancelButton: false,
       })
-      // navigate("/login")
+      navigate("/login")
     })
     .catch((error) => {
       const {message} = error.message

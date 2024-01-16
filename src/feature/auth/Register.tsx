@@ -74,7 +74,8 @@ const Register = () => {
           email : email,
           password : password,
           role : role,
-          uid : uid
+          uid : uid,
+          imgUrl: "",
       }))
       addUserToDB(uid)
       MySwal.fire({
@@ -103,7 +104,13 @@ const Register = () => {
           email : email,
           password : password,
           role : role,
-          uid : uid
+          uid : uid,
+          phone : "",
+          instagram : "",
+          facebook : "",
+          twitter : "",
+          linkedin : "",
+          imgUrl: ""    
       })
     } catch (error:any) {
         console.log(error.message)

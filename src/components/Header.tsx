@@ -5,6 +5,11 @@ import { useClickAway } from 'react-use'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Squash as Hamburger } from 'hamburger-react'
 import { useCookies } from 'react-cookie'
+import { auth } from "../config/firebase"
+import withReactContent from 'sweetalert2-react-content'
+import Swal from '../utils/types/Swal'
+import { signOut } from 'firebase/auth'
+import defaultPhoto from "../assets/user.webp"
 
 
 const Header = () => {
@@ -15,8 +20,34 @@ const Header = () => {
     const location = useLocation()
     const pathname = location.pathname
     const navigate = useNavigate()
+    const MySwal = withReactContent(Swal)
 
+    const user = auth.currentUser
+    const photoUrl = user?.photoURL
+    
+    
 
+    function handleLogout() {
+        signOut(auth)
+        .then(() => {
+            MySwal.fire({
+                title: "Logout",
+                text: "Logout Berhasil",
+                showCancelButton:false
+            })
+            removeCookie("token")
+            localStorage.removeItem("role")
+            navigate("/login")
+        })
+        .catch((err) => {
+            const {message} = err
+            MySwal.fire({
+                title: "Logout",
+                text : message,
+                showCancelButton: false
+            })
+        })
+    }
 
 
     useClickAway(ref, () => setIsOpen(false))
@@ -36,10 +67,19 @@ const Header = () => {
                 </div>
             ):null}
             <div className={pathname !== "/career" ? "flex items-center justify-center flex-1 " : "flex items-center justify-end px-24 flex-1"}>
-            {pathname !== "/career" && token ? (<NavLink to="/logout" className="py-3 text-black bg-white rounded-lg px-7">Logout</NavLink>) : pathname !== "/career" && !token ? (<NavLink to="/login" className="py-3 text-black bg-white rounded-lg px-7">Login</NavLink>) : (
-                <NavLink to="/contact us" className="px-4 py-2 text-black bg-white rounded-lg">Contact Us</NavLink>
-            )}
-                
+           
+                <div className="dropdown">
+                    <div tabIndex={0} role="button" className="flex justify-center btn-ghost hover:bg-transparent">
+                    <img src={ token && photoUrl ? photoUrl : defaultPhoto} className={token && photoUrl ? 'w-8/12 p-4 rounded-full' : 'w-2/12 p-4 rounded-full'}/>
+                    </div>
+                         <ul tabIndex={0} className={token && photoUrl ? "dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 " : "dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 ml-28"}>
+                            <li><NavLink to="/profile" className="bg-white">Profile</NavLink></li>
+                            <li>{pathname !== "/career" && token ? (<NavLink to="/logout" className="text-black bg-white rounded-lg" onClick={handleLogout}>Logout</NavLink>) : pathname !== "/career" && !token ? (<NavLink to="/login" className="text-black bg-white rounded-lg ">Login</NavLink>) : (
+                <NavLink to="/contact us" className="text-black bg-white rounded-lg ">Contact Us</NavLink>
+            )}</li>
+                        </ul>
+                </div>
+           
             </div>
             </nav>
         </div>

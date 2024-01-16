@@ -27,8 +27,38 @@ import imageUseNews from "../assets/Group 40.webp"
 import pressRelease from "../assets/Rectangle 33.webp"
 import news1 from "../assets/Group 42.webp"
 import news2 from "../assets/Group 43.webp"
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../config/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
 
 const HomePage = () => {
+  async function fetchDataUser(uid:string) {
+    try {
+      const userRef = collection(db, "users")
+      const q = query(userRef, where("uid", "==", uid));
+      const querySnap = await getDocs(q)
+      if(querySnap) {
+        querySnap.forEach((doc) => {
+          const docData = doc.data()
+          localStorage.setItem("role", JSON.stringify(docData.role))
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if(user) {
+        const uid = user.uid
+        fetchDataUser(uid)
+      }
+    })
+  }, [])
+
   return (
     <div className="w-full min-h-screen">
         {/* Header Section */}
@@ -265,7 +295,7 @@ Student results are automatically entered in the online gradebook.</p>
                   </span>
                   <h1 className="max-w-sm font-semibold tracking-normal">Class adds $30 million to its balance sheet for a Zoom-friendly edtech solution</h1>
                   <p className="max-w-sm py-6 font-normal leading-normal text-slate-400">Class, launched less than a year ago by Blackboard co-founder Michael Chasen, integrates exclusively...</p>
-                  <Link className="underline text-slate-400">Read More</Link>
+                  <Link to="#" className="underline text-slate-400">Read More</Link>
                 </div>
                 <div className="grid grid-rows-3 gap-4">
                   <div className="flex flex-row w-full gap-4">

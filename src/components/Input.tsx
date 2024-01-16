@@ -4,8 +4,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     id: string,
     placeholder?: string,
     label: string,
-    htmlFor: string,
-    ariaLabel : string,
+    htmlFor?: string,
+    ariaLabel? : string,
     name : string,
     type: string,
 }
