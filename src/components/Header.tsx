@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import logoSkillUp from "../assets/logo-skillup.webp"
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Squash as Hamburger } from 'hamburger-react'
@@ -14,7 +14,7 @@ import defaultPhoto from "../assets/user.webp"
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false)
-    const [cookie, , removeCookie] = useCookies(["token"])
+    const [cookie, , removeCookie] = useCookies(["token", "role"])
     const token = cookie.token
     const ref = useRef(null)
     const location = useLocation()
@@ -24,8 +24,7 @@ const Header = () => {
 
     const user = auth.currentUser
     const photoUrl = user?.photoURL
-    
-    
+
 
     function handleLogout() {
         signOut(auth)
@@ -36,6 +35,7 @@ const Header = () => {
                 showCancelButton:false
             })
             removeCookie("token")
+            removeCookie("role")
             localStorage.removeItem("role")
             navigate("/login")
         })
@@ -53,37 +53,75 @@ const Header = () => {
     useClickAway(ref, () => setIsOpen(false))
   return (
         <>
-        <div className='hidden xl:flex lg:flex md:flex sm:hidden'>
-            <nav className='w-full h-[7rem] bg-main flex flex-row'>
-            <div className='flex items-center flex-1 w-full px-16'>
-                <img src = {logoSkillUp} alt='Logo Skil Up' onClick={() => navigate("/")} className={pathname !== "/career" ? "w-3/12 cursor-pointer" : "w-2/12 cursor-pointer"}/>
+       
+        <div className={`${pathname !== "/" ? "bg-white" : "bg-main"} py-5`}>
+        <div className={`navbar ${pathname !== "/" ? "bg-white" : "bg-main"} bg-main w-10/12 mx-auto`}>
+  <div className="navbar-start">
+    <div className="dropdown">
+      <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+      </div>
+      <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+        <li><NavLink to="/">Home</NavLink></li>
+        <li><NavLink to="findCourses">Courses</NavLink></li>
+        <li><NavLink to="blog">Blog</NavLink></li>
+        <li><NavLink to="aboutus">Feedback</NavLink></li>
+      </ul>
+    </div>
+    <div className='flex items-center flex-1 w-full px-16'>
+                <img src = {logoSkillUp} alt='Logo Skil Up' onClick={() => navigate("/")} className="w-8/12 cursor-pointer sm:w-8/12 lg:w-5/12 xl:w-5/12 2xl:w-5/12"/>
             </div>
-            {pathname !== "/career" ? (
-                <div className='flex items-center justify-around flex-1'>
-                <NavLink to="/">Home</NavLink>
-                <NavLink to="career">Career</NavLink>
+  </div>
+  <div className="hidden navbar-center lg:flex">
+    <ul className="px-1 text-lg menu menu-horizontal gap-7">
+    <NavLink to="/">Home</NavLink>
+                <NavLink to="findCourses">Courses</NavLink>
                 <NavLink to="blog">Blog</NavLink>
-                <NavLink to="aboutus">About Us</NavLink>
-                </div>
-            ):null}
-            <div className={pathname !== "/career" ? "flex items-center justify-center flex-1 " : "flex items-center justify-end px-24 flex-1"}>
-           
-                <div className="dropdown">
-                    <div tabIndex={0} role="button" className="flex justify-center btn-ghost hover:bg-transparent">
-                    <img src={ token && photoUrl ? photoUrl : defaultPhoto} className={token && photoUrl ? 'w-8/12 p-4 rounded-full' : 'w-2/12 p-4 rounded-full'}/>
-                    </div>
-                         <ul tabIndex={0} className={token && photoUrl ? "dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 " : "dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 ml-28"}>
-                            <li><NavLink to="/profile" className="bg-white">Profile</NavLink></li>
-                            <li>{pathname !== "/career" && token ? (<NavLink to="/logout" className="text-black bg-white rounded-lg" onClick={handleLogout}>Logout</NavLink>) : pathname !== "/career" && !token ? (<NavLink to="/login" className="text-black bg-white rounded-lg ">Login</NavLink>) : (
-                <NavLink to="/contact us" className="text-black bg-white rounded-lg ">Contact Us</NavLink>
-            )}</li>
-                        </ul>
-                </div>
-           
-            </div>
-            </nav>
+                <NavLink to="aboutus">Feedback</NavLink>
+    </ul>
+  </div>
+  <div className="navbar-end">
+  <div className="dropdown dropdown-end">
+      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+        <div className="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          <span className="badge badge-sm indicator-item">8</span>
         </div>
-        <div className='z-10 flex md:hidden sm:flex lg:hidden xl:hidden'>    
+      </div>
+      
+      <div tabIndex={0} className="mt-3 z-[1] card card-compact dropdown-content w-52 bg-base-100 shadow">
+        <div className="card-body">
+          <span className="text-lg font-bold">8 Items</span>
+          <span className="text-info">Subtotal: $999</span>
+          <div className="card-actions">
+            <button className="btn btn-primary btn-block">View cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="dropdown dropdown-end">
+      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+        <div className="w-10 rounded-full">
+          <img alt="Tailwind CSS Navbar component" src={ token && photoUrl ? photoUrl : defaultPhoto}  />
+        </div>
+      </div>
+      <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 gap-2">
+        <li>
+          <NavLink to="/profile" className="justify-between p-2">
+            Profile
+            <span className="badge">New</span>
+          </NavLink>
+        </li>
+       
+        <li><button onClick={handleLogout} className='p-2'>Logout</button></li>
+      </ul>
+      </div>
+      </div>
+  </div>
+</div>
+              
+
+        {/* <div className='z-10 flex md:hidden sm:flex lg:hidden xl:hidden'>    
         <nav className='w-full h-[3rem] bg-main flex flex-row '>
             <div ref={ref} className='fixed flex items-center justify-center flex-1 w-full cursor-pointer bg-main text-md'>
                 <Hamburger toggled={isOpen} size={20} toggle={setIsOpen}/>
@@ -97,7 +135,7 @@ const Header = () => {
                         className='fixed left-0 shadow-4xl right-0 top-[2.8rem] p-5 pt-0 border-b bg-main border-b-white/20'
                         >   
                             <ul className='grid gap-4'>
-                                {/* Refactor code later */}
+                               
                                 <motion.li
                                 initial={{scale : 0, opacity: 0}}
                                 animate={{scale: 1, opacity:1}}
@@ -192,7 +230,7 @@ const Header = () => {
             <section>
             
             </section> 
-        </div>
+        </div> */}
         </>
         )}
 

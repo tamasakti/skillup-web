@@ -7,39 +7,49 @@ import { auth, db } from "../../config/firebase"
 import { sendPasswordResetEmail } from 'firebase/auth'
 import withReactContent from 'sweetalert2-react-content'
 import Swal from '../../utils/types/Swal'
-import { useEffect, useState } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
+import {useEffect, useState } from 'react'
+import { DocumentData, collection, getDocs } from 'firebase/firestore'
+import Spinner from '../../components/Spinner'
 
-interface collectionData {
-  id: string
+interface dataUser {
+  id: string,
+  data: DocumentData
 }
+
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState<string>("")
-  const [collectionDataUser, setCollections] = useState<collectionData[]>([])
   const MySwal = withReactContent(Swal)
   const navigate = useNavigate()
+  const [dataUser, setDataUser] = useState<dataUser[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
-  async function getAllData() {
+  
+  async function fetchDataToValidate() {
+    setLoading(true)
     try {
-      const newData:collectionData[] = []
-      const querySnapShot = await getDocs(collection(db, "users"));
-    querySnapShot.forEach((doc) => {
-      const dataUser : collectionData = {
-        id: doc.id,
-        ...doc.data()
-      }
-      newData.push(dataUser)
-    })
-    setCollections(newData)
-    } catch(error) {
-      console.log(error.message)
-    }
-  }
+      const userRef = collection(db, "users")
+      const querySnap = await getDocs(userRef)
+      const listingUsers:dataUser[] = []
+      querySnap.forEach((doc) => {
+        return listingUsers.push({
+          id: doc.id,
+          data: doc.data()
+        })
+       
+      })
+      setDataUser(listingUsers)
+    } catch (error) {
+      if(error instanceof Error) return console.log(error.message)
+    } finally {
+  setLoading(false)}
+  } 
 
   useEffect(() => {
-    getAllData()
+    fetchDataToValidate()
   }, [])
+
+  console.log(dataUser)
   
 
   function handleSendResetEmail (e:React.FormEvent) {
@@ -63,12 +73,30 @@ const ForgetPassword = () => {
     })
   }
 
+  let dataFilter = {}
+
+  if(email !== "") {
+    dataUser.forEach((item) => {
+      if(email === item.data.email) {
+        dataFilter = item.data
+      } 
+    })
+  }
+
+  
+
+ 
+  if(loading) {
+    return <Spinner />
+  }
+
+ 
 
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
       <div className='flex flex-col justify-center order-last w-11/12 h-full p-4 mx-auto lg:w-9/12 xl:w-9/12 md:w-10/12 sm:w-10/12 lg:order-first xl:order-first md:order-last'>
         <div className='flex flex-col gap-5 mx-auto'>
-        <img src={logoSkillup} alt='Skillup-logo' className='w-2/12' />
+        <img onClick={() => navigate("/")} src={logoSkillup} alt='Skillup-logo' className='w-2/12' />
           <h1 className='text-2xl font-bold'>Lupa kata sandi</h1>
           <h3 className='max-w-md text-md font-semibild'>Masukkan email yang kamu daftarkan sebelumnya, nanti kamu bakal dikirim email.</h3>
           <form onSubmit={handleSendResetEmail} className='flex flex-col w-full gap-8'>
@@ -82,7 +110,15 @@ const ForgetPassword = () => {
             type='email'
             className='p-2 font-semibold rounded-lg bg-input'
           />
-          
+          {Object.keys(dataFilter).length < 1 ? (
+            <div role="alert" className="alert alert-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 stroke-current shrink-0" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <span>Email yang anda masukan tidak valid</span>
+          </div>
+          ): null}
+          {/* {validateEmail === "Email yang anda masukkan tidak valid" ? (
+            
+          ):null} */}
           <Button 
           id='btn-login'
           type='submit'

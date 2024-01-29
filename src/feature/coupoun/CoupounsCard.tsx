@@ -6,8 +6,8 @@ interface cardCoupoun {
     coupounPrice:string,
     createdAt?:any,
     createdBy:string,
-    onDelete: any,
-    onEdit:any
+    onDelete: (id:string) => void,
+    onEdit:(id:string) => void
 }
 
 

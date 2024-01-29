@@ -15,7 +15,8 @@ import {auth} from "../../config/firebase"
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { login } from '../../utils/redux/slice/userSlice'
 import { useCookies } from 'react-cookie'
-import { GoogleAuthProvider, TwitterAuthProvider  } from 'firebase/auth'
+import { GoogleAuthProvider  } from 'firebase/auth'
+import Spinner from '../../components/Spinner'
 
 
 interface authData {
@@ -27,7 +28,7 @@ const Login = () => {
   const MySwal = withReactContent(Swal)
   const [disable, setDisable] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [cookie, setCookie] = useCookies(["token"])
+  const [, setCookie] = useCookies(["token"])
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [remember, setRemember] = useState<boolean>(false)
   const [authUser, setAuthUser] = useState<authData>({
@@ -83,8 +84,8 @@ function handleRememberToken() {
   function handleLogin(e:React.FormEvent) {
     e.preventDefault()
     signInWithEmailAndPassword(auth, email, password)
-    .then((response) => {
-      const {uid, email, accessToken} = response.user
+    .then((response:any) => {
+      const {accessToken} = response.user
       dispatch(login({
         token : accessToken,
         data: response.user
@@ -133,8 +134,9 @@ function handleRememberToken() {
     })
   }
 
-
-    
+  if(loading) {
+    <Spinner />
+  }
   
   return (
     <div className='grid order-last w-full min-h-screen md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'>
@@ -182,7 +184,8 @@ function handleRememberToken() {
           id='btn-login'
           type='submit'
           label='Login'
-          className='p-3 text-lg font-bold text-white rounded-lg shadow-xl bg-primary hover:bg-black hover:rounded-2xl'
+          disabled={disable}
+          className='p-3 text-lg font-bold text-white rounded-lg shadow-xl disabled:cursor-not-allowed disabled:bg-slate-300 bg-primary hover:bg-black hover:rounded-2xl'
           />
         </form>
         <span className='flex flex-row gap-1 mx-auto my-4 font-semibold'>

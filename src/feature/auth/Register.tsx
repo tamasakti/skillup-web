@@ -12,6 +12,7 @@ import {auth, db} from "../../config/firebase"
 import withReactContent from 'sweetalert2-react-content'
 import Swal from '../../utils/types/Swal'
 import { addDoc, collection } from 'firebase/firestore'
+import Spinner from '../../components/Spinner'
 
 interface inputData {
   uid? : string,
@@ -27,7 +28,7 @@ const Register = () => {
   const [disable, setDisable] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [role, setRole] = useState<string>("")
+  const [role, setRole] = useState<string>("student")
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [authUser, setAuthUser] = useState<inputData>({
@@ -98,7 +99,7 @@ const Register = () => {
 
   async function addUserToDB(uid:string) {
     try {
-      const docRef = await addDoc(collection(db, "users"), {
+      await addDoc(collection(db, "users"), {
         firstName : firstName,
           lastName : lastName,
           email : email,
@@ -112,9 +113,13 @@ const Register = () => {
           linkedin : "",
           imgUrl: ""    
       })
-    } catch (error:any) {
-        console.log(error.message)
+    } catch (error) {
+        if(error instanceof Error) return console.log(error.message)
     }
+  }
+
+  if(loading) {
+    <Spinner />
   }
 
  

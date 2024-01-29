@@ -3,12 +3,12 @@
         key: string,
         image:string,
         judul: string,
-        createdBy: string,
+        createdBy?: string,
         price: string,
-        description:string,
-        levelCourse: string, 
-        onEdit: any,
-        onDelete : any
+        description?:string,
+        levelCourse?: string, 
+        onEdit?: (id:string) => void,
+        onDelete? : (id:string) => void
     }
 
 const CourseCard = ({key, image, judul, createdBy, price, description, levelCourse, onEdit, onDelete}:cardCourseInt) => {
@@ -25,17 +25,16 @@ const CourseCard = ({key, image, judul, createdBy, price, description, levelCour
     alignItems: "center"
 }
   return (
-    <div key={key} className='px-5 py-10'>
-     
-    <div className="shadow-xl aspect-auto card w-72 bg-base-100">
-      <div className="relative bg-no-repeat bg-contain" style={backgroundImage}>
+    <div key={key} className='px-5'>
+    <div className="shadow-xl aspect-auto card w-80 h-96 bg-base-100">
+   
+      <div className="relative bg-center bg-no-repeat bg-contain" style={backgroundImage}>
       <div className="absolute p-4 font-semibold badge badge-primary top-5 left-5">{levelCourse} Level</div>
-      </div>
-  <div className="-mt-5 card-body">
-  <h2 className="mx-auto font-semibold text-center text-md">
+      <h2 className="w-8/12 p-4 mx-auto font-semibold text-center border-2 border-none rounded-lg bg-main text-md">
       {judul}
     </h2>
-    
+      </div>
+  <div className="-mt-5 card-body">
     <p className="truncate">{description}</p>
     <div className="flex justify-between card-actions ">
       <div className="badge badge-outline">{createdBy}</div>

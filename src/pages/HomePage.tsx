@@ -27,37 +27,51 @@ import imageUseNews from "../assets/Group 40.webp"
 import pressRelease from "../assets/Rectangle 33.webp"
 import news1 from "../assets/Group 42.webp"
 import news2 from "../assets/Group 43.webp"
-import { useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../config/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+// import { useEffect, useState } from "react";
+// import { onAuthStateChanged } from "firebase/auth";
+// import { auth, db } from "../config/firebase";
+// import { collection, getDocs, query, where } from "firebase/firestore";
+
+// import { useCookies } from "react-cookie";
+// import Spinner from "../components/Spinner";
 
 
 const HomePage = () => {
-  async function fetchDataUser(uid:string) {
-    try {
-      const userRef = collection(db, "users")
-      const q = query(userRef, where("uid", "==", uid));
-      const querySnap = await getDocs(q)
-      if(querySnap) {
-        querySnap.forEach((doc) => {
-          const docData = doc.data()
-          localStorage.setItem("role", JSON.stringify(docData.role))
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // const [loading, setLoading] = useState<boolean>(true)
+  // const [, setCookie] = useCookies(["role"])
+  // async function fetchDataUser(uid:string) {
+  //   setLoading(true)
+  //   try {
+  //     const userRef = collection(db, "users")
+  //     const q = query(userRef, where("uid", "==", uid));
+  //     const querySnap = await getDocs(q)
+  //     if(querySnap) {
+  //       querySnap.forEach((doc) => {
+  //         const docData = doc.data()
+  //         setCookie("role", docData.role, {
+  //           path: "/"
+  //         })
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if(user) {
-        const uid = user.uid
-        fetchDataUser(uid)
-      }
-    })
-  }, [])
+  // useEffect(() => {
+  //   onAuthStateChanged(auth, (user) => {
+  //     if(user) {
+  //       const uid = user.uid
+  //       fetchDataUser(uid)
+  //     }
+  //   })
+  // }, [])
+
+  // if(loading) {
+  //   return <Spinner />
+  // }
 
   return (
     <div className="w-full min-h-screen">
@@ -69,10 +83,9 @@ const HomePage = () => {
               <span className="font-bold text-orange-500">Studying</span> Online is now much easier
             </h1>
             <p className="max-w-sm font-normal leading-normal text-center lg:text-left xl:text-left md:text-left sm:text-center">Skilline is an interesting platform that will teach you in more an interactive way</p>
-            <div className="flex flex-row items-center gap-4">
-              <Button id="join_for_free" label="Join for free" className="py-1 font-semibold text-white bg-orange-500 rounded-full lg:py-3 xl:py-3 md:py-3 sm:py-1 lg:flex xl:flex md:flex sm:text-xs text-[.75rem] px-7 hover:bg-black hover:shadow-lg"/>
-              <FaPlayCircle className="text-4xl text-blue-600"/>
-              <p className="font-semibold text-slate-500">Watch how it works</p>
+            <div className="flex flex-row items-center gap-4 ">
+              <Button id="join_for_free" label="Find Courses" className="py-1 font-semibold text-white bg-orange-500 rounded-xl lg:py-3 xl:py-3 md:py-3 text-lg sm:py-1 lg:flex xl:flex md:flex sm:text-xs text-[.75rem] px-9 hover:bg-black hover:shadow-lg sm:mx-auto lg:ml-0 xl:ml-0 md:ml-0 2xl:ml-0 mx-auto"/>
+              
             </div>
             </div>
           </div>
@@ -98,7 +111,7 @@ const HomePage = () => {
             <span className="flex flex-row gap-1 py-8 mx-auto text-xl font-bold"><h1 className="text-blue-900">All-In-One</h1><h1 className="text-orange-500"> Cloud Software.</h1></span>
             <p className="w-10/12 max-w-xl mx-auto font-normal leading-normal text-center lg:w-full xl:w-full md:w-full sm:w-10/12 text-slate-400">Skilline is one powerful online software suite that combines all the tools needed to run a successful school or office.
 </p>
-            <div className="grid w-10/12 grid-cols-1 gap-16 py-16 mx-auto lg:gap-8 xl:gap-8 md:gap-8 sm:gap-16 lg:grid-cols-3 xl:grid-cols-3 md:grid-cols-3 sm:grid-cols-1">
+            <div className="grid w-10/12 grid-cols-1 gap-16 py-16 mx-auto lg:gap-8 xl:gap-8 md:gap-8 sm:gap-16 lg:grid-cols-3 xl:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
                 <div className="flex flex-col items-center p-8 text-center bg-white shadow-xl">
                   <img src={notesIcon} className="w-4/12 -mt-16"/>
                   <h1 className="py-5 text-xl font-semibold text-blue-700">Online Billing, Invoicing, & Contracts</h1>
@@ -218,9 +231,9 @@ Student results are automatically entered in the online gradebook.</p>
         <div className="w-full mx-auto">
               <img src={discussions} className="w-8/12 mx-auto"/>
         </div>
-            <div className="flex flex-col items-start justify-center w-8/12 px-10">
-              <h1 className="max-w-sm py-6 text-4xl font-bold leading-normal text-center text-blue-700 lg:text-left xl:text-left md:text-left sm:text-center">One-on-One <span className="text-orange-500">Discussions</span></h1>
-              <p className="max-w-sm leading-normal text-slate-500">Teachers and teacher assistants can talk with students privately without leaving the Zoom environment.</p>
+            <div className="flex flex-col items-start justify-center w-8/12 px-10 mx-auto sm:mx-auto md:ml-0 lg:ml-0 xl:ml-0 2xl:ml-0">
+              <h1 className="max-w-sm py-6 text-4xl font-bold leading-normal text-center text-blue-700lg:text-left xl:text-left md:text-left sm:text-center">One-on-One <span className="text-orange-500">Discussions</span></h1>
+              <p className="max-w-sm leading-normal text-center sm:text-center md:text-left lg:text-left xl:text-left 2xl:text-left text-slate-500">Teachers and teacher assistants can talk with students privately without leaving the Zoom environment.</p>
             </div>
             
         </div>
@@ -231,20 +244,20 @@ Student results are automatically entered in the online gradebook.</p>
         <div className="w-full mx-auto">
               <img src={driveIcon} className="w-8/12 mx-auto"/>
         </div>
-            <div className="flex flex-col items-start justify-center w-8/12 px-10">
-              <span className="flex flex-row items-center gap-4">
+            <div className="flex flex-col items-start justify-center w-8/12 px-10 mx-auto sm:mx-auto md:ml-0 lg:ml-0 xl:ml-0 2xl:ml-0">
+              <span className="flex flex-row items-center gap-4 ">
                 <h1 className="pb-3 font-bold text-slate-500">_________</h1>
                 <p className="tracking-widest text-slate-500">INTEGRATION</p>
               </span>
-              <h1 className="max-w-sm py-6 text-4xl font-bold leading-normal text-blue-700">200+ educational tools and platform <span className="text-orange-500">integrations</span></h1>
-              <p className="max-w-sm leading-normal text-slate-500">Schoology has every tool your classroom needs and comes pre-integrated with more than 200+ tools, student information systems (SIS), and education platforms.</p>
+              <h1 className="max-w-sm py-6 text-4xl font-bold leading-normal text-center text-blue-700 sm:text-center md:text-left lg:text-left xl:text-left 2xl:text-left">200+ educational tools and platform <span className="text-orange-500">integrations</span></h1>
+              <p className="max-w-sm leading-normal text-center text-slate-500 sm:text-center md:text-left lg:text-left xl:text-left 2xl:text-left">Schoology has every tool your classroom needs and comes pre-integrated with more than 200+ tools, student information systems (SIS), and education platforms.</p>
               <div className="py-6">
               <Button label="See All Integration" id="integration" className="py-3 text-orange-500 border-2 border-orange-500 rounded-full px-9"/>
               </div>
             </div>
             
         </div>
-        <div className="grid grid-cols-1 py-10 lg:grid-cols-2 xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1">
+        <div className="grid grid-cols-1 py-10 -mt-16 sm:-mt-16 md:-mt-0 lg:-mt-0 xl:-mt-0 2xl:-mt-0 lg:grid-cols-2 xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1">
             <div className="flex flex-col justify-center w-8/12 mx-auto">
             <span className="flex flex-row items-center gap-4">
                 <h1 className="pb-3 font-bold text-slate-500">_________</h1>
@@ -257,8 +270,8 @@ Student results are automatically entered in the online gradebook.</p>
                 <p className="max-w-sm leading-normal text-slate-500">Are you too? Please give your assessment</p>
               </span>
               <div className="py-6">
-              <button className="flex flex-row items-center justify-between w-7/12 gap-3 border-2 border-orange-400 rounded-full">
-                <p className="pl-4 mx-auto font-semibold text-center text-orange-400">Write your assesment</p>
+              <button className="flex flex-row items-center justify-between w-9/12 gap-3 border-2 border-orange-400 rounded-full sm:w-9/12 md:7/12 lg:7/12 xl:7/12 2xl:7/12">
+                <p className="pl-4 mx-auto text-xs font-semibold text-center text-orange-400 sm:text-xs md:text-lg lg:text-lg xl:text-lg 2xl:text-lg">Write your assesment</p>
                 <span>
                   <IoArrowForwardCircleOutline  className="text-5xl text-orange-400"/>
                 </span>
@@ -272,8 +285,8 @@ Student results are automatically entered in the online gradebook.</p>
                   <IoArrowForwardCircleOutline />
                 </span>
               </div>
-                <div className="shadow-xl w-8/12 flex h-[14rem] rounded-xl border-l-8 absolute bottom-0 left-20  border-red-500 bg-white flex-col justify-center">
-                  <p className="max-w-sm px-4 mx-auto border-l-2 border-slate-400 text-slate-500">"Thank you so much for your help. It's exactly what I've been looking for. You won't regret it. It really saves me time and effort. Skilline is exactly what our business has been lacking."</p>
+                <div className="shadow-xl w-8/12 flex h-[14rem] rounded-xl border-l-8 absolute lg:bottom-0 xl:bottom-0 md:bottom-0 2xl:bottom-0 sm:bottom-32 bottom-32 left-20  border-red-500 bg-white flex-col justify-center">
+                  <p className="max-w-sm px-4 mx-auto text-sm border-l-2 border-slate-400 text-slate-500">"Thank you so much for your help. It's exactly what I've been looking for. You won't regret it. It really saves me time and effort. Skilline is exactly what our business has been lacking."</p>
                   <div className="flex flex-row items-center justify-between w-full p-4">
                     <p className="px-4 font-semibold text-slate-400">Gloria Rose</p>
                     <span className="px-4">
@@ -284,10 +297,10 @@ Student results are automatically entered in the online gradebook.</p>
                 </div>
             </div>
         </div>
-        <div className="flex flex-col py-24">
+        <div className="flex flex-col -mt-24 lg:mt-5 xl:mt-5 md:mt-5 2xl:mt-5 sm:-mt-24">
           <h1 className="text-2xl font-semibold text-center text-blue-700">Latest News and Resources</h1>
-          <h2 className="py-4 text-center text-slate-400">See the developments that have occurred to Skillines in the world</h2>
-            <div className="grid w-10/12 grid-cols-1 py-8 mx-auto lg:grid-cols-2 xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1">
+          <h2 className="w-9/12 py-4 mx-auto text-center xl:w-12/12 lg:w-12/12 md:w-12/12 2xl:w-12/12 sm:w-9/12 text-slate-400">See the developments that have occurred to Skillines in the world</h2>
+            <div className="grid w-10/12 grid-cols-1 py-8 mx-auto -mt-5 lg:-mt-0 xl:-mt-0 md:-mt-0 2xl:-mt-0 sm:-mt-5 lg:grid-cols-2 xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1">
                 <div className="flex flex-col w-10/12 mx-auto">
                   <img src={imageUseNews} className="w-full"/>
                   <span className="w-3/12 py-4">
@@ -297,8 +310,8 @@ Student results are automatically entered in the online gradebook.</p>
                   <p className="max-w-sm py-6 font-normal leading-normal text-slate-400">Class, launched less than a year ago by Blackboard co-founder Michael Chasen, integrates exclusively...</p>
                   <Link to="#" className="underline text-slate-400">Read More</Link>
                 </div>
-                <div className="grid grid-rows-3 gap-4">
-                  <div className="flex flex-row w-full gap-4">
+                <div className="grid grid-rows-3 gap-4 mt-10 mb-16 sm:mb-16 md:mb-0 lg:mb-0 xl:mb-0 2xl:mb-0 sm:mt-10 md:mt-0 lg:mt-0 xl:mt-0 2xl:mt-0">
+                  <div className="flex flex-row justify-center w-full gap-4">
                       <div className="w-4/12 ">
                         <img src={pressRelease} />
                       </div>
@@ -307,7 +320,7 @@ Student results are automatically entered in the online gradebook.</p>
                           <p className="leading-normal text-slate-400">Class Technologies Inc., the company that created Class,...</p>
                       </div>
                   </div>
-                  <div className="flex flex-row w-full gap-4">
+                  <div className="flex flex-row justify-center w-full gap-4">
                       <div className="w-4/12">
                         <img src={news1} />
                       </div>
@@ -316,7 +329,7 @@ Student results are automatically entered in the online gradebook.</p>
                           <p className="leading-normal text-slate-400">Zoom was never created to be a consumer product. Nonetheless, the...</p>
                       </div>
                   </div>
-                  <div className="flex flex-row w-full gap-4">
+                  <div className="flex flex-row justify-center w-full gap-4">
                       <div className="w-4/12 ">
                         <img src={news2} />
                       </div>

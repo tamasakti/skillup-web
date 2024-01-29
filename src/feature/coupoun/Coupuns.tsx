@@ -3,10 +3,11 @@ import withReactContent from 'sweetalert2-react-content'
 import Swal from '../../utils/types/Swal'
 import Button from '../../components/Button'
 import { auth, db } from '../../config/firebase'
-import { addDoc, collection, getDoc, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
+import { DocumentData, addDoc, collection, deleteDoc, doc, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import Spinner from '../../components/Spinner'
 import CoupounsCard from './CoupounsCard'
+import { useNavigate } from 'react-router'
 
 
 interface coupounProps {
@@ -14,13 +15,15 @@ interface coupounProps {
   coupounPrice: number,
 }
 
+interface coursePropsData {
+  id:string,
+  data: DocumentData
+}
+
 const Coupuns = () => {
   const MySwal = withReactContent(Swal)
-  const [coupounLists, setCoupounLists] = useState([])
+  const [coupounLists, setCoupounLists] = useState<coursePropsData[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  const [edit,setEdit] = useState<boolean>(false)
-  const [detailCoupoun, setDetailCoupoun] = useState(null)
-  const [id, setId] = useState<string>("")
     const [discountTypeCreate, setDiscountTypeCreate] = useState<string>("")
     
     const [coupounData, setCoupounData] = useState<coupounProps>({
@@ -42,7 +45,7 @@ const Coupuns = () => {
         const listref = collection(db, "coupouns")
         const q = query(listref, where("uid", "==", auth.currentUser?.uid))
         const querySnap = await getDocs(q)
-        const listingsCoupouns = []
+        const listingsCoupouns:coursePropsData[] = []
         querySnap.forEach((doc) => {
           return listingsCoupouns.push({
             id: doc.id,
@@ -50,8 +53,8 @@ const Coupuns = () => {
           })
         })
         setCoupounLists(listingsCoupouns)
-      } catch (error:any) {
-        console.log(error.message)
+      } catch (error) {
+        if(error instanceof Error) return console.log(error.message)
       } finally {
         setLoading(false)
       }
@@ -78,11 +81,20 @@ const Coupuns = () => {
     }
     const {coupoun, coupounPrice} = coupounData
 
-    console.log(coupoun)
+    let message = "";
+
+    if(coupoun !== "") {
+      coupounLists.forEach((item) => {
+        if(item.data.coupoun.toLowerCase() === coupoun.toLowerCase()) {
+          message = "Nama Kupon Harus Unique, tidak boleh sama"
+        }
+      })
+    }
 
      async function submitCoupoun() {
+      setLoading(true)
       try {
-        setLoading(true)
+        
         const coupounBody = {
       ...coupounData, 
       discountTypeCreate,
@@ -90,34 +102,85 @@ const Coupuns = () => {
       createdBy: auth.currentUser?.email,
       createdAt: serverTimestamp()
     }
-    await addDoc(collection(db, "coupouns"), coupounBody)
+    const docRef = await addDoc(collection(db, "coupouns"), coupounBody)
     MySwal.fire({
       title: "Create Coupoun",
       text: "Coupouns Submitted",
       showCancelButton: false
     })
-    window.location.href = location.pathname
-      } catch (error:any) {
-        MySwal.fire({
-          title: "Create Coupoun",
-          text: error.message,
-          showCancelButton: false
-        })
+    navigate(`/editProfile/coupouns/${docRef.id}`)
+      } catch (error) {
+        if(error instanceof Error) {
+          MySwal.fire({
+            title: "Create Coupoun",
+            text: error.message,
+            showCancelButton: false
+          })
+        }
+        
       } finally {
         setLoading(false)
       }
     }
 
-     function handleEdit(id:string) {
-      setEdit(true)
-      // setLoading(true)
-      setId(id)
+    const navigate = useNavigate()
+
+    function handleEdit(id:string) {
+    navigate(`${id}`)
     }
 
     async function handleDelete(id:string) {
-
+      setLoading(true)
+      try {
+        
+        MySwal.fire({
+          title: "Are You Sure?",
+          text: "You Can't Retrieve your Data After Delete your Coupouns",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Ya, hapus Kupon!",
+          cancelButtonText: "Batal",
+        }).then((result) => {
+          if(result.isConfirmed) {
+          deleteDoc(doc(db, "coupouns", id))
+          const updatedListCoupouns = coupounLists.filter((data:coursePropsData) => data.id !== id)
+          setCoupounLists(updatedListCoupouns)
+          }
+        }).catch((error) => {
+          if(error instanceof Error) return  console.log(error.message)
+        }).finally(() => setLoading(false ))
+          
+        
+      } catch (error) {
+        if(error instanceof Error) {
+          console.log(error.message)
+        }
+        
+      } finally {
+        setLoading(false)
+      }
+      
     }
    
+    const [disabled, setDisabled] = useState<boolean>(false);
+
+    useEffect(() => {
+      if(coupoun  && discountTypeCreate  && coupounPrice > 0 && messageCoupun !== "Angka yang kamu masukan tidak valid" && message !== "Nama Kupon Harus Unique, tidak boleh sama" ) {
+        setDisabled(false)
+      } else {
+        setDisabled(true)
+      }
+
+      return () => {
+        setDisabled(false)
+      }
+    }, [coupoun, coupounPrice, discountTypeCreate, message, messageCoupun])
+
+    if(loading) {
+      return <Spinner />
+    }
 
   return (
     <div className='flex flex-col w-10/12 min-h-screen mx-auto'>
@@ -127,6 +190,7 @@ const Coupuns = () => {
      <div className="modal-box">
      <div className="flex flex-col gap-2">
        <h1 className="text-lg font-bold">Create Coupouns</h1>
+       {message !== "" ? <p className='text-red-600'>{message}</p>:null}
        <input type="text"name="coupoun" value={coupoun} onChange={handleChangeCoupoun} placeholder="Coupouns Name" className="w-full p-2 border-2 rounded-lg border-slate-500" required />
        <p className="font-semibold">Discount Type</p>
        <div className="flex flex-row w-full gap-3">
@@ -145,8 +209,9 @@ const Coupuns = () => {
             </div>
              )}
              
+            
              
-             <Button id="btn-submitcoupoun" label="Create Coupoun" className="w-full p-3 text-white transition duration-150 ease-in-out bg-blue-700 rounded-lg hover:bg-blue-500 hover:shadow-lg" type="submit" onClick={submitCoupoun}/>
+             <Button id="btn-submitcoupoun" label="Create Coupoun" className="w-full p-3 text-white transition duration-150 ease-in-out bg-blue-700 rounded-lg disabled:bg-slate-400 disabled:cursor-not-allowed hover:bg-blue-500 hover:shadow-lg" type="submit"  onClick={submitCoupoun} disabled = {disabled ? true : false}/>
        </div>
        <div className="modal-action">
          <form method="dialog">
