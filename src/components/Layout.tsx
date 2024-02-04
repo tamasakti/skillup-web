@@ -9,9 +9,20 @@ import { collection, getDocs, query, where } from 'firebase/firestore'
 import { auth, db } from '../config/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import Spinner from './Spinner'
+import CartModal from '../feature/cart/cartModal'
 
 
 const Layout = () => {
+  const [isOpenModalCart, setIsOpenModalCart] = useState<boolean>(false)
+
+  const handleOpenModalCart = () => {
+    setIsOpenModalCart(true)
+  }
+
+  const handleHideModalCart = () => {
+    setIsOpenModalCart(false)
+  }
+
   const location = useLocation()
   const pathname = location.pathname
   let hidden
@@ -112,11 +123,12 @@ const Layout = () => {
     <div className="w-full min-h-screen mx-auto overflow-hidden">
       {!hidden ? (
         <header className="w-full h-auto bg-navbar">
-        <Header />
+        <Header handleOpenModalCart={handleOpenModalCart}/>
       </header>
       ) : null}
+      {isOpenModalCart ? <CartModal handleHideModalCart={handleHideModalCart}/> : null}
+      
       <main className="w-full min-h-screen">
-
         <Outlet />
       </main>
       {!hidden ? (

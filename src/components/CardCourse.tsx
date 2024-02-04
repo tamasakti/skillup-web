@@ -1,19 +1,34 @@
 import { FaCartShopping } from "react-icons/fa6"
 
+
+
 interface cardProps {
     image: string,
     id: string,
     title: string,
     desc:string,
-    onDetail : (id:string) => void,
+    onDetail? : (id:string) => void,
     category?: string,
     levelCourse: string,
     price: string,
     priceAfterDiscount?:number,
     discountPrice?: string,
+    handleAddToChart? : (product:any) => void
 }
 
-const CardCourse = ({image, id, title, desc, onDetail, levelCourse, price, priceAfterDiscount, discountPrice}:cardProps) => {
+const CardCourse = ({image, id, title, desc, onDetail, levelCourse, price, priceAfterDiscount, discountPrice, category, handleAddToChart}:cardProps) => {
+
+  const product = {
+    image, 
+    id, 
+    title,
+    desc,
+    category,
+    levelCourse,
+    price,
+    priceAfterDiscount,
+    discountPrice
+  }
 
   const backgroundImage = {
     width: "100%",
@@ -30,7 +45,7 @@ const CardCourse = ({image, id, title, desc, onDetail, levelCourse, price, price
 
   return (
   
-    <div key={id} className="shadow-xl w-80 card bg-base-100">
+    <div key={id} className="shadow-xl w-80 h-[25rem] card bg-base-100">
       <div onClick={() => onDetail(id)} className="relative bg-center bg-no-repeat bg-contain rounded-t-lg rounded-b-none opacity-90" style={backgroundImage}>
        
       {priceAfterDiscount > 0 ? (
@@ -71,7 +86,7 @@ const CardCourse = ({image, id, title, desc, onDetail, levelCourse, price, price
       
     </div>
     <div className="w-full my-3">
-    <button className="w-full btn">
+    <button onClick={() => handleAddToChart(product)} className="w-full btn">
         <span className="flex flex-row gap-2">
         <FaCartShopping />
         <p>Add To Cart</p>
